@@ -4,10 +4,10 @@
 .settings
 .project
 .pydevproject
-sqlalchemy_mptt/.coverage
-sqlalchemy_mptt/TODO
+.coverage
+TODO
 *.pyc
-sqlalchemy_mptt/cover
+cover
 cover
 .coverage
 build

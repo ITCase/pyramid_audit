@@ -11,6 +11,8 @@ Logging Exceptions To Your SQLAlchemy Database
 """
 import base64
 import pickle
+from collections import namedtuple
+from datetime import datetime
 from json import dumps, JSONEncoder
 
 from pyramid.threadlocal import get_current_request
@@ -31,10 +33,11 @@ def _current_user_id_or_none():
     request = get_current_request()
     if request:
         user = request.authenticated_userid
-    return user
+    return user or 0
 
 
 class AuditMixin(object):
+
     """Abstract mixin wich added field for audit:
 
        * created_by_id - who create
@@ -87,13 +90,14 @@ class AuditMixin(object):
         )
 
     created_at = Column(DateTime, nullable=False,
-                        server_default=func.current_timestamp())
+                        default=datetime.now())
     updated_at = Column(DateTime, nullable=False,
-                        server_default=func.current_timestamp(),
-                        server_onupdate=func.current_timestamp())
+                        default=datetime.now(),
+                        onupdate=datetime.now())
 
 
 class PythonObjectEncoder(JSONEncoder):
+
     def default(self, obj):
         if isinstance(obj, (list, dict, str, unicode, int, float, bool,
                             type(None))):
@@ -111,7 +115,7 @@ def get_value_or_reference(values):
 
     try:
         val = values[0]
-    except:
+    except Exception:
         val = u''
 
     if hasattr(val, 'id'):
@@ -119,7 +123,6 @@ def get_value_or_reference(values):
 
     return val
 
-from collections import namedtuple
 FieldChange = namedtuple('FieldChange', 'name old_value new_value')
 
 
@@ -204,6 +207,7 @@ class LoggableMixin(object):
 
 
 class Log(Base):
+
     """  http://pyramid-cookbook.readthedocs.org/en/latest/logging/sqlalchemy_logger.html
     """
     __tablename__ = 'logs'
