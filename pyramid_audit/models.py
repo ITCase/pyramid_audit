@@ -99,7 +99,7 @@ class AuditMixin(object):
 class PythonObjectEncoder(JSONEncoder):
 
     def default(self, obj):
-        if isinstance(obj, (list, dict, str, unicode, int, float, bool,
+        if isinstance(obj, (list, dict, str, int, float, bool,
                             type(None))):
             return JSONEncoder.default(self, obj)
         return {'_python_object': base64.b64encode(pickle.dumps(obj))}
